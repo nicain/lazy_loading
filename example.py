@@ -3,6 +3,7 @@ from processing import compute_complicated_analysis
 from metadata_api import MetadataApi
 from data_api import DataApi
 
+import json
 
 class DataClass(LazyPropertyMixin):
 
@@ -16,6 +17,8 @@ class DataClass(LazyPropertyMixin):
         self.x = self.LazyProperty(self.data_api.get_x, ophys_experiment_id=self.ophys_experiment_id)
         self.y = self.LazyProperty(self.data_api.get_y, ophys_container_id=self.ophys_container_id)
 
+    def get_complicated_analysis(self):
+        return compute_complicated_analysis(self.x, self.y)
 
 class AnalysisClass(LazyPropertyMixin):
 
@@ -24,11 +27,29 @@ class AnalysisClass(LazyPropertyMixin):
         self.data_object = data_object
         self.ophys_experiment_id = self.data_object.ophys_experiment_id
 
-        self.complicated_analysis = self.LazyProperty(self.get_complicated_analysis)
+        self.complicated_analysis = self.LazyProperty(self.data_object.get_complicated_analysis)
 
-    def get_complicated_analysis(self):
-        return compute_complicated_analysis(self.data_object.x, self.data_object.y)
 
+class MarshallAnalysisClass(object):
+
+    def __init__(self, save_file_name):
+        self.save_file_name = save_file_name
+
+    def save(self, analysis_object):
+
+        with open(self.save_file_name, 'w') as f:
+            json.dump(
+                {'ophys_experiment_id': analysis_object.ophys_experiment_id,
+                'complicated_analysis': analysis_object.complicated_analysis}, f)
+
+    @property
+    def ophys_experiment_id(self):
+        return json.load(open(self.save_file_name, 'r'))['ophys_experiment_id']
+
+    def get_complicated_analysis(self, *args, **kwargs):
+        return json.load(open(self.save_file_name, 'r'))['complicated_analysis']
+
+    
 
 if __name__ == "__main__":
 
@@ -39,4 +60,7 @@ if __name__ == "__main__":
     data_object = DataClass(ophys_experiment_id, data_api, metadata_api)
     analysis_object = AnalysisClass(data_object)
 
-    print(analysis_object.complicated_analysis)
+    m = MarshallAnalysisClass('analysis_object.json')
+    m.save(analysis_object)
+
+    print(AnalysisClass(m).complicated_analysis == analysis_object.complicated_analysis)
