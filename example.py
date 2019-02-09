@@ -25,8 +25,6 @@ class AnalysisClass(LazyPropertyMixin):
     def __init__(self, data_object):
 
         self.data_object = data_object
-        self.ophys_experiment_id = self.data_object.ophys_experiment_id
-
         self.complicated_analysis = self.LazyProperty(self.data_object.get_complicated_analysis)
 
 
@@ -39,12 +37,7 @@ class MarshallAnalysisClass(object):
 
         with open(self.save_file_name, 'w') as f:
             json.dump(
-                {'ophys_experiment_id': analysis_object.ophys_experiment_id,
-                'complicated_analysis': analysis_object.complicated_analysis}, f)
-
-    @property
-    def ophys_experiment_id(self):
-        return json.load(open(self.save_file_name, 'r'))['ophys_experiment_id']
+                {'complicated_analysis': analysis_object.complicated_analysis}, f)
 
     def get_complicated_analysis(self, *args, **kwargs):
         return json.load(open(self.save_file_name, 'r'))['complicated_analysis']
