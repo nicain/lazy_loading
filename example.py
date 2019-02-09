@@ -17,8 +17,6 @@ class DataClass(LazyPropertyMixin):
         self.y = self.LazyProperty(self.data_api.get_y, ophys_container_id=self.ophys_container_id)
 
 
-
-
 class AnalysisClass(LazyPropertyMixin):
 
     def __init__(self, data_object):
@@ -26,10 +24,11 @@ class AnalysisClass(LazyPropertyMixin):
         self.data_object = data_object
         self.ophys_experiment_id = self.data_object.ophys_experiment_id
 
-        self.complicated_analysis = self.LazyProperty(self.get_complicated_analysis, ophys_experiment_id=self.ophys_experiment_id)
+        self.complicated_analysis = self.LazyProperty(self.get_complicated_analysis)
 
-    def get_complicated_analysis(self, ophys_experiment_id):
+    def get_complicated_analysis(self):
         return compute_complicated_analysis(self.data_object.x, self.data_object.y)
+
 
 if __name__ == "__main__":
 
