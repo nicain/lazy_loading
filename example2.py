@@ -17,8 +17,6 @@ class DataClass(LazyPropertyMixin):
         self.x = self.LazyProperty(self.data_api.get_x, ophys_experiment_id=self.ophys_experiment_id)
         self.y = self.LazyProperty(self.data_api.get_y, ophys_container_id=self.ophys_container_id)
 
-    def get_complicated_analysis(self):
-        return compute_complicated_analysis(self.x, self.y)
 
 class AnalysisClass(LazyPropertyMixin):
 
@@ -27,6 +25,9 @@ class AnalysisClass(LazyPropertyMixin):
         self.data_object = data_object
         self.complicated_analysis = self.LazyProperty(self.data_object.get_complicated_analysis)
 
+    @staticmethod
+    def get_complicated_analysis(data_object):
+        return compute_complicated_analysis(data_object.x, data_object.y)
 
 class MarshallAnalysisClass(object):
 
