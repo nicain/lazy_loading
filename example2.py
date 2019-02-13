@@ -22,8 +22,7 @@ class AnalysisClass(LazyPropertyMixin):
 
     def __init__(self, data_object):
 
-        self.data_object = data_object
-        self.complicated_analysis = self.LazyProperty(self.data_object.get_complicated_analysis)
+        self.complicated_analysis = self.LazyProperty(self.get_complicated_analysis, data_object)
 
     @staticmethod
     def get_complicated_analysis(data_object):
